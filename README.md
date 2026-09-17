@@ -100,6 +100,419 @@ The main objectives of this laboratory are to:
 | GitHub           | Project hosting                      |
 
 ---
+Introduction to Virtualization
+1. What is Virtualization?
+
+Virtualization is a technology that allows us to create virtual versions of computing resources such as servers, operating systems, networks, storage, and applications.
+
+Instead of using one physical machine for only one operating system or service, virtualization allows the physical resources to be shared between multiple isolated virtual environments.
+
+For example, on my physical Mac, I can use VirtualBox to create several virtual machines:
+
+Physical Machine
+       │
+       ▼
+   VirtualBox
+       │
+ ┌─────┼─────────┐
+ │     │         │
+Kali  Ubuntu  AlmaLinux
+ VM     VM        VM
+
+Each VM has its own operating system, virtual CPU, RAM, disk, and network interface.
+
+2. Types of Virtualization — What Are We Virtualizing?
+
+There are five major areas where virtualization can be applied:
+
+Desktop virtualization
+Server virtualization
+Application virtualization
+Network virtualization
+Storage virtualization
+2.1 Desktop Virtualization
+
+Desktop virtualization allows a user's desktop environment and operating system to run in a virtual environment rather than directly on the user's physical device.
+
+The user can access the virtual desktop from another device.
+
+Main types
+VDI — Virtual Desktop Infrastructure
+RDS — Remote Desktop Services
+DaaS — Desktop as a Service
+
+Example:
+
+User device
+     │
+     ▼
+Virtual Desktop
+     │
+     ▼
+Virtualization infrastructure
+2.2 Server Virtualization
+
+Server virtualization divides a physical server into multiple isolated virtual servers.
+
+Each virtual machine can run its own operating system independently.
+
+For example:
+
+Physical Server
+      │
+      ▼
+   Hypervisor
+ ┌────┼─────┐
+ │    │     │
+VM1  VM2   VM3
+Linux Windows Linux
+Main types
+Full virtualization
+Paravirtualization
+OS-level virtualization
+2.3 Application Virtualization
+
+Application virtualization allows an application to run in a virtual or isolated environment without requiring the application to be traditionally installed and integrated with the host operating system.
+
+The application can be delivered to or accessed by a user from another system.
+
+2.4 Network Virtualization
+
+Network virtualization creates logical networks independently of the underlying physical network infrastructure.
+
+Instead of configuring every physical networking device individually, network resources can be created and managed logically through software.
+
+Example:
+
+Physical Network
+       │
+       ▼
+Network Virtualization
+       │
+ ┌─────┼─────┐
+ │     │     │
+Net 1 Net 2 Net 3
+SDN — Software-Defined Networking
+
+SDN is a software-based approach to managing networks.
+
+It separates network control and management from the physical networking hardware, making networks more programmable and easier to manage.
+
+2.5 Storage Virtualization
+
+Storage virtualization combines physical storage resources and presents them as logical storage resources.
+
+For example:
+
+Physical Storage
+ ┌────┬────┬────┐
+ │Disk│Disk│Disk│
+ └────┴────┴────┘
+        │
+        ▼
+ Storage Virtualization
+        │
+        ▼
+ Logical Storage Pool
+SDS — Software-Defined Storage
+
+Software-Defined Storage (SDS) manages storage resources through software and abstracts the physical storage hardware from applications and users.
+
+3. How Are We Virtualizing?
+
+Another way to classify virtualization is according to how the virtualization is implemented.
+
+The main approaches include:
+
+Partitioning
+Full virtualization
+Software-based virtualization
+Hardware-assisted virtualization
+Paravirtualization
+Hybrid virtualization
+Container-based virtualization
+3.1 Partitioning
+
+Partitioning divides physical resources into multiple logical environments.
+
+Each environment can operate independently.
+
+The idea can be represented as:
+
+Physical Resources
+       │
+       ▼
+ ┌─────┼─────┐
+ │     │     │
+Part1 Part2 Part3
+3.2 Full Virtualization
+
+In full virtualization, the virtual machine presents virtual hardware to the guest operating system.
+
+The guest OS does not need to know that it is running inside a virtual machine.
+
+For example:
+
+Guest OS
+   │
+Virtual Hardware
+   │
+Hypervisor
+   │
+Physical Hardware
+
+VirtualBox can be used for this type of virtualization.
+
+3.3 Software-Based Virtualization
+
+Software-based virtualization performs virtualization primarily through software techniques such as binary translation.
+
+The virtualization software emulates or translates certain operations between the guest operating system and physical hardware.
+
+This can introduce additional processing overhead.
+
+3.4 Hardware-Assisted Virtualization
+
+Modern processors provide hardware virtualization extensions that help hypervisors run virtual machines efficiently.
+
+Examples include:
+
+Intel VT-x
+AMD-V
+
+The basic idea is:
+
+Virtual Machine
+      │
+      ▼
+Hypervisor
+      │
+      ▼
+CPU virtualization extensions
+      │
+      ▼
+Physical CPU
+
+KVM, Hyper-V, VMware ESXi, and other modern hypervisors can use hardware-assisted virtualization.
+
+3.5 Paravirtualization
+
+In paravirtualization, the guest operating system is aware that it is running in a virtualized environment.
+
+The guest OS can communicate with the hypervisor using virtualization-aware interfaces.
+
+This can reduce some virtualization overhead.
+
+Xen supports paravirtualization.
+
+3.6 Hybrid Virtualization
+
+Hybrid virtualization combines concepts from full virtualization and paravirtualization.
+
+The guest OS can run largely as an unmodified operating system while using paravirtualized drivers or interfaces for particular operations, especially I/O.
+
+3.7 Container-Based Virtualization
+
+Containerization provides isolated application environments without requiring a complete guest operating system for every application.
+
+A container packages an application together with its dependencies.
+
+Examples:
+
+Docker
+Podman
+
+The architecture is different from traditional VMs:
+
+Traditional VMs:
+
+VM1        VM2        VM3
+ │          │          │
+OS         OS         OS
+ └──────────┼──────────┘
+        Hypervisor
+            │
+       Host Hardware
+
+Container architecture:
+
+Container1 Container2 Container3
+     │          │          │
+     └──────────┼──────────┘
+             Host OS
+                │
+             Hardware
+
+Containers are generally lighter than complete virtual machines because they share the host operating system's kernel.
+
+4. Hypervisor / Virtual Machine Manager
+
+A hypervisor, also called a Virtual Machine Monitor (VMM), is software or firmware responsible for creating, running, and managing virtual machines.
+
+The hypervisor manages resources such as:
+
+CPU
+RAM
+Storage
+Network interfaces
+Virtual hardware
+VM lifecycle
+
+For example:
+
+Physical Hardware
+       │
+       ▼
+   Hypervisor
+       │
+ ┌─────┼─────┐
+ │     │     │
+ VM1   VM2   VM3
+
+The hypervisor allocates physical resources to each VM.
+
+5. Two Main Types of Hypervisors
+5.1 Type 1 — Bare-Metal Hypervisor
+
+A Type 1 hypervisor runs directly on the physical hardware.
+
+There is no conventional host operating system underneath the hypervisor.
+
+VM1     VM2     VM3
+ │       │       │
+ └───────┼───────┘
+     Hypervisor
+          │
+    Hardware
+
+Examples include:
+
+VMware ESXi
+Microsoft Hyper-V
+Xen
+KVM-based virtualization environments
+
+Type 1 hypervisors are commonly used in servers and data centers.
+
+5.2 Type 2 — Hosted Hypervisor
+
+A Type 2 hypervisor runs as an application on top of a host operating system.
+
+VM1       VM2       VM3
+ │         │         │
+ └─────────┼─────────┘
+       VirtualBox
+           │
+       Host OS
+           │
+       Hardware
+
+Examples include:
+
+VirtualBox
+VMware Workstation
+VMware Fusion
+Your current setup
+
+You are using:
+
+MacBook
+   │
+macOS
+   │
+VirtualBox
+   │
+ ┌─┼──────────────┐
+ │ │              │
+Kali Ubuntu   AlmaLinux
+
+Therefore, VirtualBox is a Type 2 hosted hypervisor in your setup.
+
+6. Open-Source Virtualization Projects
+
+Some important virtualization technologies include:
+
+Technology	Main concept
+KVM	Linux-based virtualization
+VirtualBox	Hosted virtualization
+Xen	Full virtualization and paravirtualization
+QEMU	Machine emulation / virtualization support
+Docker	Containerization
+Podman	Containerization
+7. KVM
+
+KVM — Kernel-based Virtual Machine — is a Linux kernel virtualization technology.
+
+When KVM is enabled, the Linux kernel provides the core virtualization infrastructure.
+
+KVM commonly works together with QEMU.
+
+Virtual Machines
+       │
+       ▼
+     QEMU
+       │
+       ▼
+      KVM
+       │
+       ▼
+Linux Kernel
+       │
+       ▼
+Physical Hardware
+
+KVM takes advantage of CPU virtualization extensions such as:
+
+Intel VT-x
+AMD-V
+8. VirtualBox
+
+VirtualBox is a desktop virtualization platform that allows us to create and run virtual machines on a host operating system.
+
+In our practical laboratory, we use VirtualBox to create:
+
+                    MacBook
+                       │
+                     macOS
+                       │
+                   VirtualBox
+                       │
+          ┌────────────┼────────────┐
+          │            │            │
+        Kali        Ubuntu       AlmaLinux
+
+Each VM can have its own:
+
+CPU
+RAM
+Virtual disk
+Network adapter
+Operating system
+Services
+9. Our Practical Virtualization Laboratory
+
+For the practical part, we use three virtual machines:
+
+VM	Operating System	Role
+VM 1	Kali Linux	Security and network testing
+VM 2	Ubuntu	Linux server / testing
+VM 3	AlmaLinux	Server / Nginx
+
+We can connect the VMs using a VirtualBox NAT Network.
+
+For example:
+
+             VirtualBox
+                  │
+            NAT Network
+        192.168.100.0/24
+                  │
+       ┌──────────┼──────────┐
+       │          │          │
+     Kali       Ubuntu    AlmaLinux
+  .100.4       .100.5      .100.6
+
+This allows the VMs to communicate with each other while maintaining network isolation from the physical network.
 
 # 💻 Laboratory Environment
 
